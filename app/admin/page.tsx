@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import JobManager from "./JobManager";
 
 type MatchRow = {
   id: string;
@@ -107,6 +108,8 @@ export default async function AdminPage() {
           );
         })}
       </div>
+
+      <JobManager />
     </div>
   );
 }
