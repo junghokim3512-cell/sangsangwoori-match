@@ -14,12 +14,16 @@ export default function HomePage() {
       </p>
 
       <div className="flex flex-col sm:flex-row gap-4">
-        <Button asChild size="lg" className="text-xl py-6 px-10">
-          <Link href="/register">프로필 등록하기</Link>
-        </Button>
-        <Button asChild size="lg" variant="outline" className="text-xl py-6 px-10">
-          <Link href="/recommendations">추천 목록 보기</Link>
-        </Button>
+        <Link href="/register">
+          <Button size="lg" className="text-xl py-6 px-10">
+            프로필 등록하기
+          </Button>
+        </Link>
+        <Link href="/recommendations">
+          <Button size="lg" variant="outline" className="text-xl py-6 px-10">
+            추천 목록 보기
+          </Button>
+        </Link>
       </div>
     </div>
   );
