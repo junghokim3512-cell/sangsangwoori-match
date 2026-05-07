@@ -34,20 +34,31 @@ export default function RegisterPage() {
     }
 
     setLoading(true);
-    const { error: dbError } = await supabase.from("seniors").insert({
-      name: form.name.trim(),
-      region: form.region,
-      desired_job: form.desired_job,
-      career_years: Number(form.career_years),
-    });
+    const { data: inserted, error: dbError } = await supabase
+      .from("seniors")
+      .insert({
+        name: form.name.trim(),
+        region: form.region,
+        desired_job: form.desired_job,
+        career_years: Number(form.career_years),
+      })
+      .select("id")
+      .single();
 
-    if (dbError) {
+    if (dbError || !inserted) {
       setError("저장 중 오류가 발생했습니다. 다시 시도해 주세요.");
       setLoading(false);
       return;
     }
 
-    router.push("/recommendations");
+    // DB 트리거가 자동 매칭 실행. 트리거 미작동 시를 위한 앱 레이어 폴백
+    await fetch("/api/match", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ senior_id: inserted.id }),
+    });
+
+    router.push(`/recommendations?senior_id=${inserted.id}`);
   }
 
   const inputClass =
