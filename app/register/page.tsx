@@ -73,8 +73,8 @@ export default function RegisterPage() {
       return;
     }
 
-    // DB 트리거가 자동 매칭 실행. 트리거 미작동 시를 위한 앱 레이어 폴백
-    fetch("/api/match", {
+    // DB 트리거(정규화 없음)를 JS 정규화 매칭으로 덮어씀 — 완료 후 이동
+    await fetch("/api/match", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ senior_id: inserted.id }),
