@@ -104,8 +104,14 @@ export default async function AdminPage() {
         매칭 상태별 시니어·일자리 현황을 한눈에 확인합니다.
       </p>
 
-      <div className="mb-8">
+      <div className="mb-8 flex flex-wrap gap-3 items-center">
         <MatchButton />
+        <Link
+          href="/admin/jobs"
+          className="inline-flex items-center justify-center rounded-lg border-2 border-border bg-background px-5 py-3 text-base font-bold text-foreground hover:bg-muted transition-colors min-h-[48px]"
+        >
+          일자리별 추천 시니어 보기 →
+        </Link>
       </div>
 
       {/* 집계 카드 3개 */}
