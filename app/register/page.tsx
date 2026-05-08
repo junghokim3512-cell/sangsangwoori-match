@@ -8,6 +8,27 @@ import { Button } from "@/components/ui/button";
 const REGIONS = ["서울", "경기", "인천"];
 const JOBS = ["경비", "청소", "주차관리", "택배분류"];
 
+const inputClass =
+  "border-2 border-input rounded-xl px-5 py-4 text-xl focus:outline-none focus:ring-2 focus:ring-ring bg-background w-full text-foreground";
+
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-xl font-bold text-foreground">{label}</span>
+      <span className="text-base text-muted-foreground mb-1">{hint}</span>
+      {children}
+    </div>
+  );
+}
+
 export default function RegisterPage() {
   const router = useRouter();
   const [form, setForm] = useState({
@@ -18,6 +39,7 @@ export default function RegisterPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -52,31 +74,42 @@ export default function RegisterPage() {
     }
 
     // DB 트리거가 자동 매칭 실행. 트리거 미작동 시를 위한 앱 레이어 폴백
-    await fetch("/api/match", {
+    fetch("/api/match", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ senior_id: inserted.id }),
     });
 
-    router.push(`/recommendations?senior_id=${inserted.id}`);
-  }
+    setLoading(false);
+    setSuccess(true);
 
-  const inputClass =
-    "border border-input rounded-lg px-4 py-3 text-xl focus:outline-none focus:ring-2 focus:ring-ring bg-background w-full";
+    setTimeout(() => {
+      router.push(`/recommendations?senior_id=${inserted.id}`);
+    }, 1500);
+  }
 
   return (
     <div className="max-w-xl mx-auto">
-      <h1 className="text-4xl font-bold mb-2">프로필 등록</h1>
+      <h1 className="text-4xl font-bold mb-2 text-foreground">
+        시니어 일자리 신청하기
+      </h1>
       <p className="text-xl text-muted-foreground mb-10">
         아래 항목을 작성하면 맞는 일자리를 자동으로 찾아드립니다.
       </p>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-        {/* 이름 */}
-        <div className="flex flex-col gap-2">
-          <label className="text-xl font-semibold" htmlFor="name">
-            이름
-          </label>
+      {success && (
+        <div className="bg-green-50 border-2 border-green-500 rounded-xl p-6 mb-8">
+          <p className="text-green-800 text-2xl font-bold">
+            등록이 완료되었습니다.
+          </p>
+          <p className="text-green-700 text-lg mt-2">
+            담당자가 곧 연락드립니다. 잠시 후 추천 목록으로 이동합니다...
+          </p>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-7">
+        <Field label="이름" hint="성함을 적어 주세요">
           <input
             id="name"
             name="name"
@@ -86,13 +119,9 @@ export default function RegisterPage() {
             onChange={handleChange}
             className={inputClass}
           />
-        </div>
+        </Field>
 
-        {/* 지역 */}
-        <div className="flex flex-col gap-2">
-          <label className="text-xl font-semibold" htmlFor="region">
-            지역
-          </label>
+        <Field label="지역" hint="어디에서 일하고 싶으세요?">
           <select
             id="region"
             name="region"
@@ -102,18 +131,12 @@ export default function RegisterPage() {
           >
             <option value="">선택해 주세요</option>
             {REGIONS.map((r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
+              <option key={r} value={r}>{r}</option>
             ))}
           </select>
-        </div>
+        </Field>
 
-        {/* 희망 직종 */}
-        <div className="flex flex-col gap-2">
-          <label className="text-xl font-semibold" htmlFor="desired_job">
-            희망 직종
-          </label>
+        <Field label="희망 직종" hint="어떤 일을 하시겠어요?">
           <select
             id="desired_job"
             name="desired_job"
@@ -123,18 +146,12 @@ export default function RegisterPage() {
           >
             <option value="">선택해 주세요</option>
             {JOBS.map((j) => (
-              <option key={j} value={j}>
-                {j}
-              </option>
+              <option key={j} value={j}>{j}</option>
             ))}
           </select>
-        </div>
+        </Field>
 
-        {/* 경력 */}
-        <div className="flex flex-col gap-2">
-          <label className="text-xl font-semibold" htmlFor="career_years">
-            경력 (년)
-          </label>
+        <Field label="경력 (년)" hint="일하신 기간이 얼마나 되세요?">
           <input
             id="career_years"
             name="career_years"
@@ -146,17 +163,19 @@ export default function RegisterPage() {
             onChange={handleChange}
             className={inputClass}
           />
-        </div>
+        </Field>
 
         {error && (
-          <p className="text-destructive text-lg font-medium">{error}</p>
+          <div className="bg-red-50 border-2 border-red-400 rounded-xl px-5 py-4">
+            <p className="text-red-800 text-lg font-semibold">{error}</p>
+          </div>
         )}
 
         <Button
           type="submit"
           size="lg"
-          disabled={loading}
-          className="mt-2 py-6 text-2xl font-bold"
+          disabled={loading || success}
+          className="mt-2 h-14 text-2xl font-bold"
         >
           {loading ? "저장 중..." : "등록하기"}
         </Button>
